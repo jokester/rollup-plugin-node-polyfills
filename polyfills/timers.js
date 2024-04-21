@@ -24,20 +24,29 @@ function clearFn(timeout) {
     timeout.close();
   }
 }
-export function setTimeout() {
-  return new Timeout(apply.call(global.setTimeout, window, arguments), clearTimeout);
+export function setTimeout(fn, delay, ...args) {
+  return new Timeout(global.setTimeout(fn, delay, ...args), [fn, delay, ...args]);
 }
 export function setInterval() {
   return new Timeout(apply.call(global.setInterval, window, arguments), clearInterval);
 }
 
-function Timeout(id) {
+function Timeout(id, args) {
   this._id = id;
+  this._args = args;
 }
 Timeout.prototype.unref = Timeout.prototype.ref = function() {};
 Timeout.prototype.close = function() {
-  clearFn(this._id);
+  clearTimeout(this._id);
 }
+Timeout.prototype.refresh = function () {
+  if (this._id) {
+    clearTimeout(this._id);
+  }
+  const [fn, delay, ...args] = this._args;
+  this._id = global.setTimeout(fn, delay, ...args);
+}
+
 
 // Does not start the time, just sets up the members needed.
 export function enroll(item, msecs) {

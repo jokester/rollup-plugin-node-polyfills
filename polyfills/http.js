@@ -158,6 +158,10 @@ export var STATUS_CODES = {
   511: 'Network Authentication Required' // RFC 6585
 };
 
+export function createServer() {
+  throw new Error("don't use");
+}
+
 export default {
   request,
   get,
